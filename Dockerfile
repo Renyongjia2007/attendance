@@ -1,3 +1,4 @@
+# Use the official Tomcat 9 image with Java 11
 FROM tomcat:9.0-jdk11-corretto
 
 # Remove the default Tomcat welcome applications (optional)
@@ -10,10 +11,15 @@ RUN rm -rf /usr/local/tomcat/webapps/ROOT \
 # Copy the war file into Tomcat's webapps folder
 COPY attendance.war /usr/local/tomcat/webapps/attendance.war
 
-# Use an entry point that adapts the port to Render's PORT variable
+# Copy the custom entrypoint script
 COPY entrypoint.sh /usr/local/tomcat/bin/entrypoint.sh
-RUN chmod +x /usr/local/tomcat/bin/entrypoint.sh
-RUN sed -i 's/\r$//' /usr/local/tomcat/bin/entrypoint.sh
 
+# Fix line endings and grant execution permissions
+RUN sed -i 's/\r$//' /usr/local/tomcat/bin/entrypoint.sh && \
+    chmod +x /usr/local/tomcat/bin/entrypoint.sh
+
+# Expose the default port
 EXPOSE 8080
+
+# Use the custom entrypoint script
 CMD ["/usr/local/tomcat/bin/entrypoint.sh"]
